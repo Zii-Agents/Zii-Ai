@@ -7,27 +7,19 @@ st.set_page_config(
     page_title="Zii-AI Assistant", page_icon="🤖", layout="centered"
 )
 
-# 2. Custom CSS untuk Tampilan & Auto-Scroll Halus ala Gemini
+# 2. Custom CSS untuk Tampilan & Baris Input
 st.markdown(
     """
     <style>
     .main {
         background-color: #f8f9fa;
     }
-    /* Auto scroll enhancement */
-    ::-webkit-scrollbar {
-        width: 8px;
-    }
-    ::-webkit-scrollbar-thumb {
-        background: #cbd5e1;
-        border-radius: 4px;
-    }
     </style>
 """,
     unsafe_allow_html=True,
 )
 
-# 3. Sidebar untuk Pengaturan Model & Riwayat
+# 3. Sidebar untuk Pengaturan Model & Riwayat (DIJAMIN TIDAK HILANG)
 with st.sidebar:
   st.image(
       "https://img.icons8.com/color/96/artificial-intelligence.png", width=70
@@ -59,7 +51,10 @@ with st.sidebar:
 
 # 4. Tampilan Utama
 st.title("🤖 Zii-AI Assistant")
-st.caption("Asisten cerdas serbaguna. Upload file & ketik pesan dalam satu area!")
+st.caption(
+    "Asisten cerdas serbaguna. Gunakan tombol upload di bawah lalu ketik"
+    " pesan."
+)
 
 # Inisialisasi OpenAI Client dengan Base URL 9Router
 client = OpenAI(
@@ -82,15 +77,18 @@ for message in st.session_state.messages:
     if message.get("resp_time"):
       st.caption(f"⚡ Respon dalam {message['resp_time']}")
 
-# 5. Area Upload File & Input Chat yang Menyatu (Gaya Gemini)
-col_upload, col_chat = st.columns([1, 5])
+# 5. Area Upload File & Input Chat Berdampingan di Bawah
+col_btn, col_txt = st.columns([1, 11])
 
-with col_upload:
+with col_btn:
   uploaded_file = st.file_uploader(
-      "📎", type=["png", "jpg", "jpeg", "pdf"], label_visibility="collapsed"
+      "Upload",
+      type=["png", "jpg", "jpeg", "pdf"],
+      label_visibility="collapsed",
+      key="file_uploader_bar",
   )
 
-with col_chat:
+with col_txt:
   user_input = st.chat_input("Ketik pesan di sini...")
 
 # Eksekusi ketika user mengirim pesan
@@ -111,7 +109,7 @@ if user_input:
   # Kirim permintaan ke API 9Router sekaligus catat waktu (timer)
   with st.chat_message("assistant"):
     with st.spinner("✨ Zii-AI sedang meracik jawaban..."):
-      start_time = time.time()  # Mulai hitung waktu
+      start_time = time.time()
       try:
         response = client.chat.completions.create(
             model=model_choice,
@@ -120,17 +118,15 @@ if user_input:
                 for m in st.session_state.messages
             ],
         )
-        end_time = time.time()  # Selesai hitung waktu
+        end_time = time.time()
         elapsed_time = round(end_time - start_time, 2)
 
         reply = response.choices[0].message.content
         st.markdown(reply)
 
-        # Tampilkan info waktu respons langsung di bawah jawaban bot
         time_info = f"{elapsed_time} detik"
         st.caption(f"⚡ Respon dalam {time_info}")
 
-        # Simpan respons asisten beserta waktu responsnya ke riwayat
         st.session_state.messages.append({
             "role": "assistant",
             "content": reply,
@@ -138,11 +134,10 @@ if user_input:
             "resp_time": time_info,
         })
 
-        # Trigger auto-scroll / refresh state ringan agar posisi layar turun ke bawah
         st.rerun()
 
       except Exception as e:
         st.error(
             f"Terjadi kesalahan saat menghubungi API: {e}\n\nTips: Coba ganti"
-            " model di sidebar jika terkena limit."
+            " model di sidebar jika terkena limit (Error 429)."
         )
