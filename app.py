@@ -7,23 +7,19 @@ st.set_page_config(
     page_title="Zii-AI Assistant", page_icon="🤖", layout="centered"
 )
 
-# 2. Custom CSS untuk Merapikan Baris Bawah (Chat Bar)
+# 2. Custom CSS Biar Estetik
 st.markdown(
     """
     <style>
     .main {
         background-color: #f8f9fa;
     }
-    /* Memperkecil jarak elemen bawah */
-    .stChatInput {
-        padding-top: 0px;
-    }
     </style>
 """,
     unsafe_allow_html=True,
 )
 
-# 3. Sidebar untuk Pengaturan Model & Riwayat Chat
+# 3. Sidebar untuk Pengaturan Model, Upload File, & Riwayat Chat
 with st.sidebar:
   st.image(
       "https://img.icons8.com/color/96/artificial-intelligence.png", width=70
@@ -48,6 +44,14 @@ with st.sidebar:
 
   st.markdown("---")
 
+  # Fitur Upload File ditaruh di Sidebar agar layar utama bersih ala Gemini
+  uploaded_file = st.file_uploader(
+      "📎 Lampirkan File/Foto (Opsional):",
+      type=["png", "jpg", "jpeg", "pdf"],
+  )
+
+  st.markdown("---")
+
   if st.button("🧹 Bersihkan Riwayat Chat", type="primary"):
     st.session_state.messages = []
     st.rerun()
@@ -57,8 +61,8 @@ with st.sidebar:
 # 4. Tampilan Utama
 st.title("🤖 Zii-AI Assistant")
 st.caption(
-    "Asisten cerdas serbaguna. Gunakan tombol ➕ di samping kotak pesan untuk"
-    " lampirkan file."
+    "Asisten cerdas serbaguna. Ketik pesan di bawah, atau upload file lewat"
+    " menu sidebar ☰ di pojok kiri atas."
 )
 
 # Inisialisasi OpenAI Client dengan Base URL 9Router
@@ -82,23 +86,8 @@ for message in st.session_state.messages:
     if message.get("resp_time"):
       st.caption(f"⚡ Respon dalam {message['resp_time']}")
 
-# 5. Baris Chat Bawah: Tombol ➕ (Upload) berdampingan persis dengan Kotak Pesan
-col_btn, col_txt = st.columns([1, 10])
-
-with col_btn:
-  # Tombol upload ringkas dengan ikon plus/upload di samping kiri
-  uploaded_file = st.file_uploader(
-      "➕",
-      type=["png", "jpg", "jpeg", "pdf"],
-      label_visibility="collapsed",
-      key="inline_uploader",
-  )
-
-with col_txt:
-  user_input = st.chat_input("Ketik pesan di sini...")
-
-# Eksekusi ketika user mengirim pesan
-if user_input:
+# 5. Kolom Input Chat Utama (Bersih & Full Lebar di Bawah)
+if user_input := st.chat_input("Ketik pesan di sini..."):
   file_container = uploaded_file if uploaded_file else None
 
   # Simpan pesan user ke session state
@@ -133,7 +122,6 @@ if user_input:
         time_info = f"{elapsed_time} detik"
         st.caption(f"⚡ Respon dalam {time_info}")
 
-        # Simpan respons ke riwayat tanpa bug scroll/rerun
         st.session_state.messages.append({
             "role": "assistant",
             "content": reply,
