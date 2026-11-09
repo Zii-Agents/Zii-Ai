@@ -1,3 +1,4 @@
+import time
 import streamlit as st
 from openai import OpenAI
 
@@ -6,32 +7,40 @@ st.set_page_config(
     page_title="Zii-AI Assistant", page_icon="🤖", layout="centered"
 )
 
-# 2. Custom CSS Biar Makin Estetik
+# 2. Custom CSS untuk Tampilan & Auto-Scroll Halus ala Gemini
 st.markdown(
     """
     <style>
     .main {
         background-color: #f8f9fa;
     }
+    /* Auto scroll enhancement */
+    ::-webkit-scrollbar {
+        width: 8px;
+    }
+    ::-webkit-scrollbar-thumb {
+        background: #cbd5e1;
+        border-radius: 4px;
+    }
     </style>
 """,
     unsafe_allow_html=True,
 )
 
-# 3. Sidebar untuk Pengaturan Model & Riwayat (PILIHAN MODEL ADA DI SINI)
+# 3. Sidebar untuk Pengaturan Model & Riwayat
 with st.sidebar:
   st.image(
       "https://img.icons8.com/color/96/artificial-intelligence.png", width=70
   )
   st.title("Zii-AI Control")
   st.info(
-      "🚀 **1B Token Power**\nTerhubung aman ke 9Router API dengan dukungan"
-      " chat & file."
+      "🚀 **1B Token Power**\nTerhubung aman ke 9Router API dengan fitur"
+      " multimodal terpadu."
   )
 
   st.markdown("---")
 
-  # Pilihan Model AI Resmi 9Router untuk Ganti-ganti Model
+  # Pilihan Model AI Resmi 9Router
   model_choice = st.selectbox(
       "🤖 Pilih Model AI:",
       [
@@ -50,12 +59,9 @@ with st.sidebar:
 
 # 4. Tampilan Utama
 st.title("🤖 Zii-AI Assistant")
-st.caption(
-    "Asisten cerdas serbaguna. Silakan upload file/gambar lalu ketik pesan di"
-    " bawah."
-)
+st.caption("Asisten cerdas serbaguna. Upload file & ketik pesan dalam satu area!")
 
-# Inisialisasi OpenAI Client dengan Base URL 9Router yang aman
+# Inisialisasi OpenAI Client dengan Base URL 9Router
 client = OpenAI(
     api_key=st.secrets.get("OPENAI_API_KEY"),
     base_url="https://secure.rootly.my.id/v1",
@@ -65,7 +71,7 @@ client = OpenAI(
 if "messages" not in st.session_state:
   st.session_state.messages = []
 
-# Tampilkan riwayat pesan chat
+# Tampilkan riwayat pesan chat sebelumnya
 for message in st.session_state.messages:
   with st.chat_message(message["role"]):
     if message.get("file_url"):
@@ -73,14 +79,22 @@ for message in st.session_state.messages:
           message["file_url"], caption="Lampiran File", use_container_width=True
       )
     st.markdown(message["content"])
+    if message.get("resp_time"):
+      st.caption(f"⚡ Respon dalam {message['resp_time']}")
 
-# 5. Fitur Upload File Terpisah yang Stabil
-uploaded_file = st.file_uploader(
-    "📎 Upload foto atau dokumen (opsional):", type=["png", "jpg", "jpeg", "pdf"]
-)
+# 5. Area Upload File & Input Chat yang Menyatu (Gaya Gemini)
+col_upload, col_chat = st.columns([1, 5])
 
-# 6. Kolom Input Chat
-if user_input := st.chat_input("Ketik pesan di sini..."):
+with col_upload:
+  uploaded_file = st.file_uploader(
+      "📎", type=["png", "jpg", "jpeg", "pdf"], label_visibility="collapsed"
+  )
+
+with col_chat:
+  user_input = st.chat_input("Ketik pesan di sini...")
+
+# Eksekusi ketika user mengirim pesan
+if user_input:
   file_container = uploaded_file if uploaded_file else None
 
   # Simpan pesan user ke session state
@@ -94,9 +108,10 @@ if user_input := st.chat_input("Ketik pesan di sini..."):
       st.image(file_container, caption="Lampiran File", use_container_width=True)
     st.markdown(user_input)
 
-  # Kirim permintaan ke API 9Router
+  # Kirim permintaan ke API 9Router sekaligus catat waktu (timer)
   with st.chat_message("assistant"):
     with st.spinner("✨ Zii-AI sedang meracik jawaban..."):
+      start_time = time.time()  # Mulai hitung waktu
       try:
         response = client.chat.completions.create(
             model=model_choice,
@@ -105,13 +120,29 @@ if user_input := st.chat_input("Ketik pesan di sini..."):
                 for m in st.session_state.messages
             ],
         )
+        end_time = time.time()  # Selesai hitung waktu
+        elapsed_time = round(end_time - start_time, 2)
+
         reply = response.choices[0].message.content
         st.markdown(reply)
-        st.session_state.messages.append(
-            {"role": "assistant", "content": reply, "file_url": None}
-        )
+
+        # Tampilkan info waktu respons langsung di bawah jawaban bot
+        time_info = f"{elapsed_time} detik"
+        st.caption(f"⚡ Respon dalam {time_info}")
+
+        # Simpan respons asisten beserta waktu responsnya ke riwayat
+        st.session_state.messages.append({
+            "role": "assistant",
+            "content": reply,
+            "file_url": None,
+            "resp_time": time_info,
+        })
+
+        # Trigger auto-scroll / refresh state ringan agar posisi layar turun ke bawah
+        st.rerun()
+
       except Exception as e:
         st.error(
             f"Terjadi kesalahan saat menghubungi API: {e}\n\nTips: Coba ganti"
-            " model ke pilihan lain di menu sidebar jika error 429."
+            " model di sidebar jika terkena limit."
         )
