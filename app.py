@@ -24,7 +24,7 @@ with st.sidebar:
   st.image(
       "https://img.icons8.com/color/96/artificial-intelligence.png", width=70
   )
-  st.title("Zii-AI Control")
+  st.title("Zii-AI Menu")
   st.info(
       "🚀 **1B Token Power**\nTerhubung aman ke 9Router API dengan dukungan"
       " chat & file."
@@ -50,7 +50,7 @@ with st.sidebar:
   st.write("Dibuat dengan oleh Zii")
 
 # 4. Tampilan Utama
-st.title("🤖 Zii-AI Assistant")
+st.title("🤖 Zii-Agent")
 st.caption(
     "Asisten cerdas serbaguna. Silakan upload file/gambar lalu ketik pesan di"
     " bawah."
