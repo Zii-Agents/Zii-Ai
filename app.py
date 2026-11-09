@@ -5,7 +5,7 @@ from openai import OpenAI
 
 # 1. Konfigurasi Halaman
 st.set_page_config(
-    page_title="zii-agent.ai", page_icon="🤖", layout="centered"
+    page_title="Zii-Agent.Ai", page_icon="🤖", layout="centered"
 )
 
 
@@ -87,7 +87,7 @@ with st.sidebar:
   )
   st.title("Zii-Ai Menu")
   st.info(
-      "**zii-agent.ai**\nTerhubung ke 9Router API dengan penyimpanan riwayat"
+      "**Zii-Agent**\nTerhubung ke 9Router API dengan penyimpanan riwayat"
       " permanen."
   )
 
@@ -111,7 +111,7 @@ with st.sidebar:
   st.write("Dibuat oleh zii-agent")
 
 # 5. Tampilan Utama
-st.title("zii-agent.ai")
+st.title("Zii-Agent.Ai")
 st.caption("Asisten cerdas serbaguna. Gunakan menu upload di bawah untuk melampirkan file.")
 
 client = OpenAI(
