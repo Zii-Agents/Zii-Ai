@@ -7,10 +7,15 @@ st.set_page_config(
     page_title="Zii-AI Assistant", page_icon="🤖", layout="centered"
 )
 
-# 2. Custom CSS Biar Estetik
+# 2. Custom CSS untuk Merapikan Jarak Atas (Biar Tidak Ketutupan Sidebar/Tombol HP)
 st.markdown(
     """
     <style>
+    /* Mengatur jarak agar judul utama tidak ketutupan tombol navigasi atas */
+    .block-container {
+        padding-top: 2.5rem;
+        padding-bottom: 5rem;
+    }
     .main {
         background-color: #f8f9fa;
     }
@@ -44,7 +49,7 @@ with st.sidebar:
 
   st.markdown("---")
 
-  # Fitur Upload File ditaruh di Sidebar agar layar utama bersih ala Gemini
+  # Fitur Upload File di Sidebar (Aman dan Bersih di HP)
   uploaded_file = st.file_uploader(
       "📎 Lampirkan File/Foto (Opsional):",
       type=["png", "jpg", "jpeg", "pdf"],
@@ -86,7 +91,7 @@ for message in st.session_state.messages:
     if message.get("resp_time"):
       st.caption(f"⚡ Respon dalam {message['resp_time']}")
 
-# 5. Kolom Input Chat Utama (Bersih & Full Lebar di Bawah)
+# 5. Kolom Input Chat Utama di Bawah
 if user_input := st.chat_input("Ketik pesan di sini..."):
   file_container = uploaded_file if uploaded_file else None
 
