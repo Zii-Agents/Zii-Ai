@@ -3,13 +3,36 @@ import time
 import streamlit as st
 from openai import OpenAI
 
-# 1. Konfigurasi Halaman
+# 1. Konfigurasi Halaman & Mobile Fix untuk Sidebar
 st.set_page_config(
-    page_title="Zii-Agent.Ai", page_icon="🤖", layout="centered"
+    page_title="zii-agent.ai",
+    page_icon="🤖",
+    layout="centered",
+    initial_sidebar_state="collapsed"
 )
 
+# 2. Custom CSS untuk Merapikan Tampilan & Mencegah Bug Sidebar di HP
+st.markdown("""
+    <style>
+    .main .block-container {
+        padding-top: 2rem !important;
+        padding-bottom: 5rem !important;
+    }
+    section[data-testid="stSidebar"] {
+        top: 0 !important;
+        height: 100% !important;
+    }
+    section[data-testid="stSidebar"] > div {
+        padding-top: 1rem !important;
+    }
+    .main {
+        background-color: #f8f9fa;
+    }
+    </style>
+""", unsafe_allow_html=True)
 
-# 2. Inisialisasi Database SQLite
+
+# 3. Inisialisasi Database SQLite (Riwayat Chat Permanen)
 def init_db():
   conn = sqlite3.connect("chat_history.db", check_same_thread=False)
   c = conn.cursor()
@@ -68,18 +91,6 @@ def clear_db():
 
 init_db()
 
-# 3. Custom CSS Minimalis
-st.markdown(
-    """
-    <style>
-    .main {
-        background-color: #f8f9fa;
-    }
-    </style>
-""",
-    unsafe_allow_html=True,
-)
-
 # 4. Sidebar Zii-Ai Menu
 with st.sidebar:
   st.image(
@@ -87,7 +98,7 @@ with st.sidebar:
   )
   st.title("Zii-Ai Menu")
   st.info(
-      "**Zii-Agent**\nTerhubung ke 9Router API dengan penyimpanan riwayat"
+      "**zii-agent.ai**\nTerhubung ke 9Router API dengan penyimpanan riwayat"
       " permanen."
   )
 
@@ -111,7 +122,7 @@ with st.sidebar:
   st.write("Dibuat oleh zii-agent")
 
 # 5. Tampilan Utama
-st.title("Zii-Agent.Ai")
+st.title("zii-agent.ai")
 st.caption("Asisten cerdas serbaguna. Gunakan menu upload di bawah untuk melampirkan file.")
 
 client = OpenAI(
@@ -121,7 +132,7 @@ client = OpenAI(
 
 messages = load_messages()
 
-# Tampilkan riwayat chat
+# Tampilkan riwayat chat dari database
 for message in messages:
   with st.chat_message(message["role"]):
     if message.get("file_url"):
@@ -164,7 +175,7 @@ if user_input := st.chat_input("Ketik pesan di sini..."):
 
         reply = response.choices[0].message.content
 
-        # Membersihkan tag <think> jika model mengeluarkannya
+        # Membersihkan tag <think> jika model memunculkannya
         if "</think>" in reply:
           reply = reply.split("</think>")[-1].strip()
 
