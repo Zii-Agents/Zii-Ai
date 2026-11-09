@@ -5,7 +5,7 @@ from openai import OpenAI
 
 # 1. Konfigurasi Halaman
 st.set_page_config(
-    page_title="Zii-AI Assistant", page_icon="🤖", layout="centered"
+    page_title="Zii-Agent", page_icon="🤖", layout="centered"
 )
 
 
@@ -110,10 +110,10 @@ with st.sidebar:
     clear_db()
     st.rerun()
 
-  st.write("Dibuat dengan ❤️ oleh Zii")
+  st.write("Dibuat dengan oleh Zii")
 
 # 5. Tampilan Utama
-st.title("🤖 Zii-AI Assistant")
+st.title("🤖 Zii-Agent.Ai")
 st.caption(
     "Asisten cerdas serbaguna. Gunakan tombol upload di bawah lalu ketik pesan."
 )
