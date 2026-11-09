@@ -6,7 +6,7 @@ st.set_page_config(
     page_title="Zii-AI Assistant", page_icon="🤖", layout="centered"
 )
 
-# 2. Custom CSS Biar Makin Estetik ala Gemini
+# 2. Custom CSS Biar Makin Estetik
 st.markdown(
     """
     <style>
@@ -25,8 +25,8 @@ with st.sidebar:
   )
   st.title("Zii-AI Control")
   st.info(
-      "🚀 **1B Token Power**\nTerhubung aman ke 9Router API dengan fitur"
-      " multimodal terpadu."
+      "🚀 **1B Token Power**\nTerhubung aman ke 9Router API dengan dukungan"
+      " chat & file."
   )
 
   st.markdown("---")
@@ -51,8 +51,8 @@ with st.sidebar:
 # 4. Tampilan Utama
 st.title("🤖 Zii-AI Assistant")
 st.caption(
-    "Asisten cerdas serbaguna. Lampirkan gambar/dokumen langsung di kolom chat"
-    " bawah!"
+    "Asisten cerdas serbaguna. Silakan upload file/gambar lalu ketik pesan di"
+    " bawah."
 )
 
 # Inisialisasi OpenAI Client dengan Base URL 9Router yang aman
@@ -74,32 +74,25 @@ for message in st.session_state.messages:
       )
     st.markdown(message["content"])
 
-# 5. Kolom Input Chat Pintar (Menyatu dengan Upload File)
-user_prompt = st.chat_input(
-    "Ketik pesan atau lampirkan file...", accept_file="uploaded-file"
+# 5. Fitur Upload File Terpisah yang Stabil
+uploaded_file = st.file_uploader(
+    "📎 Upload foto atau dokumen (opsional):", type=["png", "jpg", "jpeg", "pdf"]
 )
 
-# Cek apakah user mengirim pesan atau file lewat chat input
-if user_prompt:
-  user_text = user_prompt.text if hasattr(user_prompt, "text") else user_prompt
-  uploaded_file = (
-      user_prompt.files[0]
-      if hasattr(user_prompt, "files") and user_prompt.files
-      else None
-  )
-
+# 6. Kolom Input Chat
+if user_input := st.chat_input("Ketik pesan di sini..."):
   file_container = uploaded_file if uploaded_file else None
 
-  # Simpan pesan user ke session state dengan aman
+  # Simpan pesan user ke session state
   st.session_state.messages.append(
-      {"role": "user", "content": user_text, "file_url": file_container}
+      {"role": "user", "content": user_input, "file_url": file_container}
   )
 
   # Render pesan user di UI
   with st.chat_message("user"):
     if file_container:
       st.image(file_container, caption="Lampiran File", use_container_width=True)
-    st.markdown(user_text)
+    st.markdown(user_input)
 
   # Kirim permintaan ke API 9Router
   with st.chat_message("assistant"):
@@ -118,4 +111,3 @@ if user_prompt:
             {"role": "assistant", "content": reply, "file_url": None}
         )
       except Exception as e:
-        st.error(f"Terjadi kesalahan saat menghubungi API: {e}")
