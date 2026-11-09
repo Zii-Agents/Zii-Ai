@@ -18,7 +18,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 3. Sidebar untuk Pengaturan Model & Riwayat
+# 3. Sidebar untuk Pengaturan Model & Riwayat (PILIHAN MODEL ADA DI SINI)
 with st.sidebar:
   st.image(
       "https://img.icons8.com/color/96/artificial-intelligence.png", width=70
@@ -31,7 +31,7 @@ with st.sidebar:
 
   st.markdown("---")
 
-  # Pilihan Model AI dengan ID Resmi 9Router
+  # Pilihan Model AI Resmi 9Router untuk Ganti-ganti Model
   model_choice = st.selectbox(
       "🤖 Pilih Model AI:",
       [
@@ -111,5 +111,7 @@ if user_input := st.chat_input("Ketik pesan di sini..."):
             {"role": "assistant", "content": reply, "file_url": None}
         )
       except Exception as e:
-        st.error(f"Terjadi kesalahan saat menghubungi API: {e}")
-
+        st.error(
+            f"Terjadi kesalahan saat menghubungi API: {e}\n\nTips: Coba ganti"
+            " model ke pilihan lain di menu sidebar jika error 429."
+        )
