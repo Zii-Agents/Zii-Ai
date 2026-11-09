@@ -1,17 +1,64 @@
 import streamlit as st
 from openai import OpenAI
 
-st.set_page_config(page_title="Zii-AI", page_icon="🤖")
-
-st.title("🤖 Zii-AI Assistant")
-st.write("1B Token Power • Chat & Image Support")
-
-# Pilihan Model AI
-model_choice = st.selectbox(
-    "Pilih Model AI:", ["DeepSeek V4 Flash", "GLM 5.3 Flash", "MiniMax M2.7"]
+# 1. Konfigurasi Halaman
+st.set_page_config(
+    page_title="Zii-AI Assistant", page_icon="🤖", layout="centered"
 )
 
-# Inisialisasi client OpenAI dengan base_url secure
+# 2. Custom CSS Biar Makin Estetik ala Gemini
+st.markdown(
+    """
+    <style>
+    .main {
+        background-color: #f8f9fa;
+    }
+    stChatInput {
+        border-radius: 20px;
+    }
+    </style>
+""",
+    unsafe_allow_html=True,
+)
+
+# 3. Sidebar untuk Pengaturan Model & Riwayat
+with st.sidebar:
+  st.image(
+      "https://img.icons8.com/color/96/artificial-intelligence.png", width=70
+  )
+  st.title("Zii-AI Control")
+  st.info(
+      "🚀 **1B Token Power**\nTerhubung aman ke 9Router API dengan fitur"
+      " multimodal terpadu."
+  )
+
+  st.markdown("---")
+
+  # Pilihan Model AI dengan ID Resmi 9Router
+  model_choice = st.selectbox(
+      "🤖 Pilih Model AI:",
+      [
+          "deepseek-ai/DeepSeek-V4-Flash-0731",
+          "MiniMaxAI/MiniMax-M2.7",
+          "zai-org/GLM-5.3-Flash",
+      ],
+  )
+
+  if st.button("🧹 Bersihkan Riwayat Chat", type="primary"):
+    st.session_state.messages = []
+    st.rerun()
+
+  st.markdown("---")
+  st.write("Dibuat dengan ❤️ oleh Zii")
+
+# 4. Tampilan Utama
+st.title("🤖 Zii-AI Assistant")
+st.caption(
+    "Asisten cerdas serbaguna. Lampirkan gambar/dokumen langsung di kolom chat"
+    " bawah!"
+)
+
+# Inisialisasi OpenAI Client dengan Base URL 9Router
 client = OpenAI(
     api_key=st.secrets.get("OPENAI_API_KEY"),
     base_url="https://secure.rootly.my.id/v1",
@@ -21,43 +68,30 @@ client = OpenAI(
 if "messages" not in st.session_state:
   st.session_state.messages = []
 
-# Tampilkan pesan sebelumnya
+# Tampilkan riwayat pesan chat
 for message in st.session_state.messages:
   with st.chat_message(message["role"]):
+    # Jika pesan berisi gambar/file yang dilampirkan sebelumnya
+    if "file_url" in message and message["file_url"]:
+      st.image(message["file_url"], caption="Lampiran", use_container_width=True)
     st.markdown(message["content"])
 
-# Fitur Upload Gambar / File
-uploaded_file = st.file_uploader(
-    "Upload foto atau dokumen (opsional):", type=["png", "jpg", "jpeg", "pdf"]
+# 5. Kolom Input Chat Pintar (Menyatu dengan Upload File ala Gemini)
+user_prompt = st.chat_input(
+    "Ketik pesan atau lampirkan file...", accept_file="uploaded-file"
 )
 
-# Input chat dari user
-if user_input := st.chat_input("Ketik pesan di sini..."):
-  # Tampilkan gambar kalau user ada upload foto
+# Cek apakah user mengirim pesan atau file lewat chat input
+if user_prompt:
+  user_text = user_prompt.text
+  uploaded_file = user_prompt.files[0] if user_prompt.files else None
+
+  # Jika ada file yang di-upload bersamaan
+  file_container = None
   if uploaded_file:
-    st.image(uploaded_file, caption="Gambar yang di-upload", use_container_width=True)
+    # Tampilkan preview gambar/file di chat user
+    file_container = uploaded_file
 
-  # Simpan pesan user
-  st.session_state.messages.append({"role": "user", "content": user_input})
-  with st.chat_message("user"):
-    st.markdown(user_input)
-
-  # Kirim ke API 9Router
-  with st.chat_message("assistant"):
-    with st.spinner("AI lagi mikir..."):
-      try:
-        response = client.chat.completions.create(
-            model=model_choice,
-            messages=[
-                {"role": m["role"], "content": m["content"]}
-                for m in st.session_state.messages
-            ],
-        )
-        reply = response.choices[0].message.content
-        st.markdown(reply)
-        st.session_state.messages.append(
-            {"role": "assistant", "content": reply}
-        )
-      except Exception as e:
-        st.error(f"Terjadi kesalahan: {e}")
-
+  # Simpan pesan user ke session
+  st.session_state.messages.append(
+      {"role": "user", "content": user_text, "file_url": file_container}
