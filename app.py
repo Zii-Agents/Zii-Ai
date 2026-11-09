@@ -7,7 +7,7 @@ st.set_page_config(
     page_title="Zii-AI Assistant", page_icon="🤖", layout="centered"
 )
 
-# 2. Custom CSS untuk Tampilan & Baris Input
+# 2. Custom CSS Biar Estetik
 st.markdown(
     """
     <style>
@@ -19,7 +19,7 @@ st.markdown(
     unsafe_allow_html=True,
 )
 
-# 3. Sidebar untuk Pengaturan Model & Riwayat (DIJAMIN TIDAK HILANG)
+# 3. Sidebar untuk Pengaturan Model, Upload File, & Riwayat Chat
 with st.sidebar:
   st.image(
       "https://img.icons8.com/color/96/artificial-intelligence.png", width=70
@@ -27,7 +27,7 @@ with st.sidebar:
   st.title("Zii-AI Control")
   st.info(
       "🚀 **1B Token Power**\nTerhubung aman ke 9Router API dengan fitur"
-      " multimodal terpadu."
+      " multimodal."
   )
 
   st.markdown("---")
@@ -42,18 +42,27 @@ with st.sidebar:
       ],
   )
 
+  st.markdown("---")
+
+  # Fitur Upload File dipindah ke Sidebar agar layar utama bersih ala Gemini
+  uploaded_file = st.file_uploader(
+      "📎 Lampirkan File/Foto (Opsional):",
+      type=["png", "jpg", "jpeg", "pdf"],
+  )
+
+  st.markdown("---")
+
   if st.button("🧹 Bersihkan Riwayat Chat", type="primary"):
     st.session_state.messages = []
     st.rerun()
 
-  st.markdown("---")
   st.write("Dibuat dengan ❤️ oleh Zii")
 
 # 4. Tampilan Utama
 st.title("🤖 Zii-AI Assistant")
 st.caption(
-    "Asisten cerdas serbaguna. Gunakan tombol upload di bawah lalu ketik"
-    " pesan."
+    "Asisten cerdas serbaguna. Ketik pesan di bawah, atau upload file lewat"
+    " menu sidebar ☰ di pojok kiri atas."
 )
 
 # Inisialisasi OpenAI Client dengan Base URL 9Router
@@ -77,22 +86,8 @@ for message in st.session_state.messages:
     if message.get("resp_time"):
       st.caption(f"⚡ Respon dalam {message['resp_time']}")
 
-# 5. Area Upload File & Input Chat Berdampingan di Bawah
-col_btn, col_txt = st.columns([1, 11])
-
-with col_btn:
-  uploaded_file = st.file_uploader(
-      "Upload",
-      type=["png", "jpg", "jpeg", "pdf"],
-      label_visibility="collapsed",
-      key="file_uploader_bar",
-  )
-
-with col_txt:
-  user_input = st.chat_input("Ketik pesan di sini...")
-
-# Eksekusi ketika user mengirim pesan
-if user_input:
+# 5. Kolom Input Chat Utama (Bersih & Full Lebar di Bawah)
+if user_input := st.chat_input("Ketik pesan di sini..."):
   file_container = uploaded_file if uploaded_file else None
 
   # Simpan pesan user ke session state
@@ -106,7 +101,7 @@ if user_input:
       st.image(file_container, caption="Lampiran File", use_container_width=True)
     st.markdown(user_input)
 
-  # Kirim permintaan ke API 9Router sekaligus catat waktu (timer)
+  # Kirim permintaan ke API 9Router sekaligus hitung waktu respons (timer)
   with st.chat_message("assistant"):
     with st.spinner("✨ Zii-AI sedang meracik jawaban..."):
       start_time = time.time()
