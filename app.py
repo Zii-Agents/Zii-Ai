@@ -108,10 +108,10 @@ with st.sidebar:
     clear_db()
     st.rerun()
 
-  st.write("Dibuat oleh Zii")
+  st.write("Dibuat oleh zii-agent")
 
 # 5. Tampilan Utama
-st.title("Zii-Agent.Ai")
+st.title("zii-agent.ai")
 st.caption("Asisten cerdas serbaguna. Gunakan menu upload di bawah untuk melampirkan file.")
 
 client = OpenAI(
@@ -138,4 +138,45 @@ uploaded_file = st.file_uploader(
 )
 
 # Input Chat Utama
-if user_input
+if user_input := st.chat_input("Ketik pesan di sini..."):
+  file_container = uploaded_file if uploaded_file else None
+
+  save_message("user", user_input, file_container)
+
+  with st.chat_message("user"):
+    if file_container:
+      st.image(file_container, caption="Lampiran File", use_container_width=True)
+    st.markdown(user_input)
+
+  with st.chat_message("assistant"):
+    with st.spinner("Memproses respons..."):
+      start_time = time.time()
+      try:
+        response = client.chat.completions.create(
+            model=model_choice,
+            messages=[
+                {"role": m["role"], "content": m["content"]} for m in messages
+            ]
+            + [{"role": "user", "content": user_input}],
+        )
+        end_time = time.time()
+        elapsed_time = round(end_time - start_time, 2)
+
+        reply = response.choices[0].message.content
+
+        # Membersihkan tag <think> jika model mengeluarkannya
+        if "</think>" in reply:
+          reply = reply.split("</think>")[-1].strip()
+
+        st.markdown(reply)
+
+        time_info = f"{elapsed_time} detik"
+        st.caption(f"Respon dalam {time_info}")
+
+        save_message("assistant", reply, None, time_info)
+
+      except Exception as e:
+        st.error(
+            f"Terjadi kesalahan saat menghubungi API: {e}\n\nTips: Coba ganti"
+            " model di sidebar."
+        )
