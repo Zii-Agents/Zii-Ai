@@ -5,7 +5,7 @@ from openai import OpenAI
 
 # 1. Konfigurasi Halaman & Mobile Fix untuk Sidebar
 st.set_page_config(
-    page_title="tauhid-agent.ai"
+    page_title="Tauhid-agent.ai"
     page_icon="🤖",
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -91,7 +91,7 @@ def clear_db():
 
 init_db()
 
-# 4. Sidebar Tauhid-Ai Menu
+# 4. Sidebar tauhid-Ai Menu
 with st.sidebar:
   st.image(
       "https://img.icons8.com/color/96/artificial-intelligence.png", width=70
