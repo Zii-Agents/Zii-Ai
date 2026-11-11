@@ -5,7 +5,7 @@ from openai import OpenAI
 
 # 1. Konfigurasi Halaman & Mobile Fix untuk Sidebar
 st.set_page_config(
-    page_title="zii-agent.ai",
+    page_title="tauhid-agent.ai"
     page_icon="🤖",
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -91,12 +91,12 @@ def clear_db():
 
 init_db()
 
-# 4. Sidebar Zii-Ai Menu
+# 4. Sidebar Tauhid-Ai Menu
 with st.sidebar:
   st.image(
       "https://img.icons8.com/color/96/artificial-intelligence.png", width=70
   )
-  st.title("Zii-Ai Menu")
+  st.title("Tauhid-Ai Menu")
   st.info(
       "**zii-agent.ai**\nTerhubung ke 9Router API dengan penyimpanan riwayat"
       " permanen."
@@ -119,10 +119,10 @@ with st.sidebar:
     clear_db()
     st.rerun()
 
-  st.write("Dibuat oleh zii-agent")
+  st.write("Dibuat oleh Tauhid-agent")
 
 # 5. Tampilan Utama
-st.title("zii-agent.ai")
+st.title("Tauhid-agent.ai")
 st.caption("Asisten cerdas serbaguna. Gunakan menu upload di bawah untuk melampirkan file.")
 
 client = OpenAI(
