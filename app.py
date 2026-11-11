@@ -5,7 +5,7 @@ from openai import OpenAI
 
 # 1. Konfigurasi Halaman & Mobile Fix untuk Sidebar
 st.set_page_config(
-    page_title="Tauhid-agent.ai",
+    page_title="nnahdiz-agent.ai",
     page_icon="🤖",
     layout="centered",
     initial_sidebar_state="collapsed"
@@ -91,7 +91,7 @@ def clear_db():
 
 init_db()
 
-# 4. Sidebar tauhid-Ai Menu
+# 4. Sidebar nnahdiz-Ai Menu
 with st.sidebar:
   st.image(
       "https://img.icons8.com/color/96/artificial-intelligence.png", width=70
@@ -119,10 +119,10 @@ with st.sidebar:
     clear_db()
     st.rerun()
 
-  st.write("Dibuat oleh Tauhid-agent")
+  st.write("Dibuat oleh nnahdi-agent")
 
 # 5. Tampilan Utama
-st.title("Tauhid-agent.ai")
+st.title("nnahdiz-agent.ai")
 st.caption("Asisten cerdas serbaguna. Gunakan menu upload di bawah untuk melampirkan file.")
 
 client = OpenAI(
