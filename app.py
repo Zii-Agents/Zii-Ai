@@ -5,7 +5,7 @@ from openai import OpenAI
 
 # 1. Konfigurasi Halaman & Mobile Fix untuk Sidebar
 st.set_page_config(
-    page_title="hid-agent.ai"
+    page_title="Tauhid-agent.ai",
     page_icon="🤖",
     layout="centered",
     initial_sidebar_state="collapsed"
